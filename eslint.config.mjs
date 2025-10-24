@@ -1,18 +1,44 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
-  // Override default ignores of eslint-config-next.
-  globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-  ]),
+	...nextVitals,
+	...nextTs,
+
+	globalIgnores([
+		'.next/**',
+		'out/**',
+		'build/**',
+		'dist/**',
+		'node_modules/**',
+		'next-env.d.ts',
+		'*.config.js',
+		'*.config.mjs',
+		'*.config.ts',
+	]),
+
+	{
+		rules: {
+			// React
+			'react/prop-types': 'off',
+			'react/react-in-jsx-scope': 'off',
+
+			// TypeScript
+			'@typescript-eslint/no-unused-vars': [
+				'warn',
+				{
+					argsIgnorePattern: '^_',
+					varsIgnorePattern: '^_',
+				},
+			],
+			'@typescript-eslint/no-explicit-any': 'warn',
+
+			// General
+			'no-console': ['warn', { allow: ['warn', 'error'] }],
+			'prefer-const': 'warn',
+		},
+	},
 ]);
 
 export default eslintConfig;
