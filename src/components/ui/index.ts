@@ -4,7 +4,6 @@ export { Checkbox } from './checkbox';
 export { Dialog } from './dialog';
 export { Input } from './input';
 export { InputOTP } from './input-otp';
-export { Popover } from './popover';
 export { Select } from './select';
 export { Sheet } from './sheet';
 export { Slider } from './slider';
