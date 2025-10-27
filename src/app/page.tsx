@@ -1,4 +1,10 @@
-import { Container, Filters, Title, TopBar } from '@/components/shared';
+import {
+	Container,
+	Filters,
+	ProductCard,
+	Title,
+	TopBar,
+} from '@/components/shared';
 
 export default function Home() {
 	return (
@@ -13,11 +19,18 @@ export default function Home() {
 					<div className='w-[250px]'>
 						<Filters />
 					</div>
-				</div>
 
-				{/* <div className='flex-1'>
-					<div className='flex flex-col gap-16'>Список товаров</div>
-				</div> */}
+					<div className='flex-1'>
+						<div className='flex flex-col gap-16'>
+							<ProductCard
+								id={1}
+								name='Четыре сезона'
+								price={539}
+								imageUrl='https://media.dodostatic.net/image/r:292x292/0198bf47733e787a98ed55d13e9a2251.avif'
+							/>
+						</div>
+					</div>
+				</div>
 			</Container>
 		</>
 	);

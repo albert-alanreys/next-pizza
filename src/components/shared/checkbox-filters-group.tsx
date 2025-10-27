@@ -36,7 +36,11 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 		item.text.toLowerCase().includes(searchValue.toLowerCase()),
 	);
 
-	const onClick = () => {
+	const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchValue(e.target.value);
+	};
+
+	const onClickCollapseButton = () => {
 		setShowAll(!showAll);
 		setSearchValue('');
 	};
@@ -50,7 +54,7 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 					<Input
 						className='bg-gray-50 border-none'
 						placeholder={searchInputPlaceholder}
-						onChange={(e) => setSearchValue(e.target.value)}
+						onChange={onChangeSearchInput}
 					/>
 				</div>
 			)}
@@ -73,7 +77,7 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 
 			{items.length > limit && (
 				<div className={showAll ? 'border-t border-t-neutral-100 mt-4' : ''}>
-					<button onClick={onClick} className='text-primary mt-3'>
+					<button onClick={onClickCollapseButton} className='text-primary mt-3'>
 						{showAll ? 'Скрыть' : '+ Показать все'}
 					</button>
 				</div>
