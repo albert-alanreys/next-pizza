@@ -1,4 +1,5 @@
 export { Categories } from './categories';
+export { CheckboxFiltersGroup } from './checkbox-filters-group';
 export { Container } from './container';
 export { FilterCheckbox } from './filter-checkbox';
 export { Filters } from './filters';
