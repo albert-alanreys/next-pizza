@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useIntersection } from 'react-use';
 
 import { cn } from '@/lib/utils';
 
@@ -22,21 +23,35 @@ export const ProductsGroupList: React.FC<Props> = ({
 	listClassName,
 	className,
 }) => {
+	const intersectionRef = React.useRef<HTMLDivElement | null>(null);
+	const intersection = useIntersection(
+		intersectionRef as React.RefObject<HTMLDivElement>,
+		{ threshold: 0.4 },
+	);
+
+	React.useEffect(() => {
+		if (intersection?.isIntersecting) {
+			console.log(title, categoryId);
+		}
+	}, [intersection?.isIntersecting]);
+
 	return (
 		<div className={className} id={title}>
 			<Title text={title} size='lg' className='font-extrabold mb-5' />
-			<div className={cn('grid grid-cols-3 gap-[50px]', listClassName)}>
-				{products
-					.filter((product) => product.items.length > 0)
-					.map((product, index) => (
-						<ProductCard
-							key={product.id}
-							id={product.id}
-							name={product.name}
-							imageUrl={product.imageUrl}
-							price={product.items[0].price}
-						/>
-					))}
+
+			<div
+				ref={intersectionRef}
+				className={cn('grid grid-cols-3 gap-[50px]', listClassName)}
+			>
+				{products.map((product, index) => (
+					<ProductCard
+						key={product.id}
+						id={product.id}
+						name={product.name}
+						imageUrl={product.imageUrl}
+						price={product.price}
+					/>
+				))}
 			</div>
 		</div>
 	);
