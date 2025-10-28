@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React from 'react';
 
 import { Input } from '../ui/input';
 
@@ -11,12 +11,14 @@ type Item = FilterCheckboxProps;
 interface Props {
 	title: string;
 	items: Item[];
-	defaultItems: Item[];
+	defaultItems?: Item[];
 	limit?: number;
 	searchInputPlaceholder?: string;
-	onChange?: (value: string[]) => void;
-	defaultValue?: string[];
 	className?: string;
+	selectedIds?: Set<string>;
+	onClickCheckbox?: (value: string) => void;
+	loading?: boolean;
+	name?: string;
 }
 
 export const CheckboxFiltersGroup: React.FC<Props> = ({
@@ -25,25 +27,40 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 	defaultItems,
 	limit = 5,
 	searchInputPlaceholder = 'Поиск...',
-	onChange,
-	defaultValue,
 	className,
+	selectedIds,
+	onClickCheckbox,
+	loading,
+	name,
 }) => {
-	const [showAll, setShowAll] = useState(false);
-	const [searchValue, setSearchValue] = useState('');
+	const [showAll, setShowAll] = React.useState(false);
+	const [searchValue, setSearchValue] = React.useState('');
 
 	const filteredItems = items.filter((item) =>
 		item.text.toLowerCase().includes(searchValue.toLowerCase()),
 	);
 
-	const onChangeSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setSearchValue(e.target.value);
-	};
-
-	const onClickCollapseButton = () => {
+	const handleToggleShowAll = () => {
 		setShowAll(!showAll);
 		setSearchValue('');
 	};
+
+	if (loading) {
+		return (
+			<div className={className}>
+				<p className='font-bold mb-3'>{title}</p>
+
+				{...Array.from({ length: limit }, () => 0).map((_, index) => (
+					<div
+						key={index}
+						className='w-full mb-4 h-6 bg-gray-200 rounded-[8px] animate-pulse'
+					/>
+				))}
+
+				<div className='w-28 h-4 bg-gray-200 rounded-[8px] animate-pulse' />
+			</div>
+		);
+	}
 
 	return (
 		<div className={className}>
@@ -52,32 +69,32 @@ export const CheckboxFiltersGroup: React.FC<Props> = ({
 			{showAll && (
 				<div className='mb-5'>
 					<Input
-						className='bg-gray-50 border-none'
 						placeholder={searchInputPlaceholder}
-						onChange={onChangeSearchInput}
+						className='bg-gray-50 border-none'
+						onChange={(e) => setSearchValue(e.target.value)}
 					/>
 				</div>
 			)}
 
 			<div className='flex flex-col gap-4 max-h-96 pr-2 overflow-auto scrollbar'>
-				{(showAll
-					? filteredItems
-					: defaultItems.slice(0, limit) || filteredItems
-				).map((item, index) => (
-					<FilterCheckbox
-						key={index}
-						text={item.text}
-						value={item.value}
-						endAdornment={item.endAdornment}
-						checked={false}
-						onCheckedChange={(ids) => console.log(ids)}
-					/>
-				))}
+				{(showAll ? filteredItems : defaultItems || filteredItems).map(
+					(item) => (
+						<FilterCheckbox
+							onCheckedChange={() => onClickCheckbox?.(item.value)}
+							checked={selectedIds?.has(item.value)}
+							key={String(item.value)}
+							value={item.value}
+							text={item.text}
+							endAdornment={item.endAdornment}
+							name={name}
+						/>
+					),
+				)}
 			</div>
 
 			{items.length > limit && (
 				<div className={showAll ? 'border-t border-t-neutral-100 mt-4' : ''}>
-					<button onClick={onClickCollapseButton} className='text-primary mt-3'>
+					<button onClick={handleToggleShowAll} className='text-primary mt-3'>
 						{showAll ? 'Скрыть' : '+ Показать все'}
 					</button>
 				</div>

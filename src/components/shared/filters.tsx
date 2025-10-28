@@ -1,77 +1,152 @@
-import { Input, RangeSlider } from '../ui';
+'use client';
 
-import { CheckboxFiltersGroup } from './checkbox-filters-group';
-import { FilterCheckbox } from './filter-checkbox';
+import { Ingredient } from '@prisma/client';
+import debounce from 'lodash.debounce';
+import { useRouter, useSearchParams } from 'next/navigation';
+import qs from 'qs';
+import React from 'react';
+import { useMap, useSet } from 'react-use';
+
+import { Input } from '@/components/ui/input';
+
+import { CheckboxFiltersGroup } from '@/components/shared/checkbox-filters-group';
+
+import { Api } from '@/services/api-client';
+
+import { RangeSlider } from '../ui/range-slider';
+
 import { Title } from './title';
 
 interface Props {
 	className?: string;
 }
 
-const items = [
-	{
-		text: 'Сырный соус',
-		value: '1',
-	},
-	{
-		text: 'Моцарелла',
-		value: '2',
-	},
-	{
-		text: 'Чеснок',
-		value: '3',
-	},
-	{
-		text: 'Солёные огурчики',
-		value: '4',
-	},
-	{
-		text: 'Красный лук',
-		value: '5',
-	},
-	{
-		text: 'Томаты',
-		value: '6',
-	},
-	{
-		text: 'Перец',
-		value: '7',
-	},
-	{
-		text: 'Грибы',
-		value: '8',
-	},
-	{
-		text: 'Курица',
-		value: '9',
-	},
-];
-
 export const Filters: React.FC<Props> = ({ className }) => {
+	const searchParams = useSearchParams();
+
+	const router = useRouter();
+
+	const [filters, { set }] = useMap(Object.fromEntries(searchParams.entries()));
+
+	const [ingredients, setIngredients] = React.useState<Ingredient[]>([]);
+
+	const [selectedIngredientsIds, { toggle }] = useSet(new Set<string>());
+	const [pizzaTypes, { toggle: togglePizzaTypes }] = useSet(new Set<string>());
+	const [sizes, { toggle: toggleSizes }] = useSet(new Set<string>());
+
+	React.useEffect(() => {
+		async function fetchIngredients() {
+			const data = await Api.ingredients.getAll();
+			setIngredients(data);
+		}
+
+		fetchIngredients();
+	}, []);
+
+	const updateQueryParams = React.useMemo(
+		() =>
+			debounce((params) => {
+				router.push(
+					`?${qs.stringify(params, {
+						arrayFormat: 'comma',
+					})}`,
+					{ scroll: false },
+				);
+			}, 300),
+		[],
+	);
+
+	React.useEffect(() => {
+		updateQueryParams({
+			...filters,
+			ingredients: Array.from(selectedIngredientsIds),
+			sizes: Array.from(sizes),
+			pizzaTypes: Array.from(pizzaTypes),
+		});
+	}, [filters, selectedIngredientsIds, pizzaTypes, sizes]);
+
+	const defaultIngredients = ingredients
+		?.slice(0, 6)
+		.map((o) => ({ text: o.name, value: o.id.toString() }));
+
 	return (
 		<div className={className}>
-			<Title text='Фильтрация' size='sm' className='mb-5 font-bold' />
+			<Title
+				text='Фильтрация'
+				size='sm'
+				className='mb-5 font-bold pb-4 border-b border-b-neutral-100'
+			/>
 
-			<div className='flex flex-col gap-4'>
-				<FilterCheckbox text='Можно собирать' value='1' />
-				<FilterCheckbox text='Новинки' value='2' />
-			</div>
+			<CheckboxFiltersGroup
+				name='pizzaTypes'
+				className='mb-5'
+				title='Тип теста'
+				onClickCheckbox={togglePizzaTypes}
+				items={[
+					{ text: 'Тонкое', value: '1' },
+					{ text: 'Традиционное', value: '2' },
+				]}
+			/>
 
-			<div className='mt-5 border-y border-y-neutral-100 py-6 pb-7'>
+			<CheckboxFiltersGroup
+				name='sizes'
+				className='mb-5'
+				title='Размеры'
+				onClickCheckbox={toggleSizes}
+				items={[
+					{ text: '20 см', value: '20' },
+					{ text: '30 см', value: '30' },
+					{ text: '40 см', value: '40' },
+				]}
+			/>
+
+			<div className='mt-10 pb-7'>
 				<p className='font-bold mb-3'>Цена от и до:</p>
 				<div className='flex gap-3 mb-5'>
-					<Input type='number' placeholder='0' min={0} max={1000} />
-					<Input type='number' placeholder='1000' min={100} max={1000} />
+					<Input
+						type='number'
+						placeholder='0'
+						min={0}
+						max={30000}
+						onChange={(e) => set('priceFrom', e.target.value)}
+						value={String(filters.priceFrom || 0)}
+					/>
+					<Input
+						type='number'
+						min={100}
+						max={30000}
+						placeholder='30000'
+						onChange={(e) => set('priceTo', e.target.value)}
+						value={String(filters.priceTo || 0)}
+					/>
 				</div>
-				<RangeSlider min={0} max={1000} step={10} value={[0, 1000]} />
+				<RangeSlider
+					min={0}
+					max={1000}
+					step={10}
+					value={[
+						Number(filters.priceFrom) || 0,
+						Number(filters.priceTo) || 1000,
+					]}
+					onValueChange={([priceFrom, priceTo]) => {
+						set('priceFrom', String(priceFrom || 0));
+						set('priceTo', String(priceTo || 0));
+					}}
+				/>
 			</div>
 
 			<CheckboxFiltersGroup
-				title='Ингредиенты'
+				name='ingredients'
+				loading={ingredients.length === 0}
 				className='mt-5'
-				limit={5}
-				defaultItems={items}
-				items={items}
+				title='Ингредиенты'
+				limit={6}
+				onClickCheckbox={toggle}
+				defaultItems={defaultIngredients}
+				items={
+					ingredients?.map((o) => ({ text: o.name, value: o.id.toString() })) ||
+					[]
+				}
 			/>
 		</div>
 	);
