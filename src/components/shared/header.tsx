@@ -1,5 +1,6 @@
 import { ArrowRight, ShoppingCart, User } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 
@@ -8,22 +9,31 @@ import { Button } from '../ui';
 import { Container } from './container';
 
 interface Props {
+	hasSearch?: boolean;
 	className?: string;
 }
 
-export const Header: React.FC<Props> = ({ className }) => {
+export const Header: React.FC<Props> = ({ className, hasSearch = true }) => {
 	return (
 		<header className={cn('border border-b', className)}>
 			<Container className='flex justify-between items-center py-8'>
-				<div className='flex items-center gap-4'>
-					<Image src='/logo.png' alt='Logo' width={32} height={32}></Image>
-					<div>
-						<h1 className='text-2xl uppercase font-black'>Next Pizza</h1>
-						<p className='text-sm text-gray-400 leading-3'>
-							вкусней уже некуда
-						</p>
+				<Link href='/'>
+					<div className='flex items-center gap-4'>
+						<Image src='/logo.png' alt='Logo' width={32} height={32}></Image>
+						<div>
+							<h1 className='text-2xl uppercase font-black'>Next Pizza</h1>
+							<p className='text-sm text-gray-400 leading-3'>
+								вкусней уже некуда
+							</p>
+						</div>
 					</div>
-				</div>
+				</Link>
+
+				{hasSearch && (
+					<div className='mx-10 flex-1'>
+						<SearchInput />
+					</div>
+				)}
 
 				<div className='flex items-center gap-3'>
 					<Button variant='outline' className='flex items-center gap-3'>
