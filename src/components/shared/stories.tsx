@@ -46,7 +46,7 @@ export const Stories: React.FC<Props> = ({ className }) => {
 				)}
 			>
 				{stories.length === 0 &&
-					[...Array(6)].map((_, index) => (
+					[...Array.from({ length: 6 }, () => 0)].map((_, index) => (
 						<div
 							key={index}
 							className='w-[200px] h-[250px] bg-gray-200 rounded-md animate-pulse'
