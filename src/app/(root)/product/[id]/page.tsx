@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { Container } from '@/components/shared/container';
 import { ProductsGroupList } from '@/components/shared/products-group-list';
 
+import { ChoosePizzaForm } from '@/components/shared';
+
 import { prisma } from '@/lib/prisma';
 
 export default async function ProductPage({
@@ -53,6 +55,13 @@ export default async function ProductPage({
 
 	return (
 		<Container className='flex flex-col my-10'>
+			<ChoosePizzaForm
+				imageUrl={product.imageUrl}
+				name={product.name}
+				items={product.items}
+				ingredients={product.ingredients}
+			/>
+
 			<ProductsGroupList
 				className='mt-20'
 				listClassName='grid-cols-4'

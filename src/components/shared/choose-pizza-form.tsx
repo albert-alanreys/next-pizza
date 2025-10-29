@@ -9,6 +9,8 @@ import { cn } from '@/lib/utils';
 
 import { Button } from '../ui/button';
 
+import { IngredientsList } from './ingredients-list';
+import { PizzaImage } from './pizza-image';
 import { PizzaSelector } from './pizza-selector';
 import { Title } from './title';
 
@@ -63,6 +65,8 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 
 	return (
 		<div className={cn(className, 'flex flex-1')}>
+			<PizzaImage imageUrl={imageUrl} size={size} />
+
 			<div className='w-[490px] bg-[#FCFCFC] p-7'>
 				<Title text={name} size='md' className='font-extrabold mb-1' />
 
@@ -76,7 +80,13 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 					onClickPizzaType={setPizzaType}
 				/>
 
-				<div className='bg-gray-50 p-5 rounded-md h-[420px] overflow-auto scrollbar'></div>
+				<div className='bg-gray-50 p-5 rounded-md h-[420px] overflow-auto scrollbar'>
+					<IngredientsList
+						ingredients={ingredients}
+						onClickAdd={toggleAddIngredient}
+						selectedIds={selectedIngredientsIds}
+					/>
+				</div>
 
 				<Button
 					loading={loading}
