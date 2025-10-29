@@ -48,20 +48,22 @@ export const ProductsGroupList: React.FC<Props> = ({
 				ref={intersectionRef}
 				className={cn('grid grid-cols-3 gap-[50px]', listClassName)}
 			>
-				{products.map((product) => {
-					return (
-						<ProductCard
-							key={product.id}
-							id={product.id}
-							name={product.name}
-							imageUrl={product.imageUrl}
-							price={Math.min(
-								...Array.from(product.items, (item) => item.price),
-							)}
-							ingredients={product.ingredients}
-						/>
-					);
-				})}
+				{products
+					.filter((product) => product.items.length > 0)
+					.map((product) => {
+						return (
+							<ProductCard
+								key={product.id}
+								id={product.id}
+								name={product.name}
+								imageUrl={product.imageUrl}
+								price={Math.min(
+									...Array.from(product.items, (item) => item.price),
+								)}
+								ingredients={product.ingredients}
+							/>
+						);
+					})}
 			</div>
 		</div>
 	);

@@ -12,6 +12,7 @@ import {
 	Sheet,
 	SheetClose,
 	SheetContent,
+	SheetDescription,
 	SheetFooter,
 	SheetHeader,
 	SheetTitle,
@@ -32,9 +33,10 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
 		<Sheet>
 			<SheetTrigger asChild>{children}</SheetTrigger>
 			<SheetContent className='flex flex-col justify-between pb-0 bg-[#F4F1EE]'>
-				<SheetTitle>
-					<VisuallyHidden>Корзина</VisuallyHidden>
-				</SheetTitle>
+				{/* Добавляем SheetDescription для accessibility */}
+				<VisuallyHidden>
+					<SheetDescription>Корзина с выбранными товарами</SheetDescription>
+				</VisuallyHidden>
 
 				<div
 					className={clsx(

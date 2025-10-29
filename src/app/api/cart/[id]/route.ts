@@ -63,9 +63,11 @@ async function updateCartTotalAmount(userId: number, cartToken: string) {
 
 export async function PATCH(
 	req: NextRequest,
-	{ params }: { params: { id: string } },
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
+		const resolvedParams = await params;
+
 		const cartToken = req.cookies.get('cartToken')?.value;
 		const userId = Number(1);
 
@@ -75,7 +77,7 @@ export async function PATCH(
 
 		const cartItem = await prisma.cartItem.findFirst({
 			where: {
-				id: Number(params.id),
+				id: Number(resolvedParams.id),
 			},
 		});
 
@@ -136,9 +138,11 @@ export async function PATCH(
 
 export async function DELETE(
 	req: NextRequest,
-	{ params }: { params: { id: string } },
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
+		const resolvedParams = await params;
+
 		const cartToken = req.cookies.get('cartToken')?.value;
 		const userId = Number(1);
 
@@ -148,7 +152,7 @@ export async function DELETE(
 
 		const cartItem = await prisma.cartItem.findFirst({
 			where: {
-				id: Number(params.id),
+				id: Number(resolvedParams.id),
 			},
 		});
 

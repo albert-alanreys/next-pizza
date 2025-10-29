@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 
 import { Container } from '@/components/shared/container';
 import { ProductsGroupList } from '@/components/shared/products-group-list';

@@ -10,6 +10,7 @@ export { Header } from './header';
 export { OrderItem } from './order-item';
 export { Pagination } from './pagination';
 export { ProductCard } from './product-card';
+
 export { ProductsGroupList } from './products-group-list';
 export { SearchInput } from './search-input';
 export { SortPopup } from './sort-popup';

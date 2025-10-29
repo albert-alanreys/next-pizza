@@ -20,7 +20,6 @@ interface Props {
 	className?: string;
 	ingredients: IProduct['ingredients'];
 	items?: IProduct['items'];
-	onClickAdd?: VoidFunction;
 }
 
 export const ChoosePizzaForm: React.FC<Props> = ({
@@ -28,7 +27,6 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 	items,
 	imageUrl,
 	ingredients,
-	onClickAdd,
 	className,
 }) => {
 	const {
@@ -56,7 +54,6 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 	const handleClickAdd = async () => {
 		try {
 			await addPizza();
-			onClickAdd?.();
 		} catch (error) {
 			toast.error('Произошла ошибка при добавлении в корзину');
 			console.error(error);

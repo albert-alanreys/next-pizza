@@ -56,7 +56,6 @@ export default async function HomePage({
 								pageCount={meta.pageCount}
 								currentPage={meta.currentPage}
 							/>
-							<span className='text-sm text-gray-400'>5 из 65</span>
 						</div>
 					</div>
 				</div>

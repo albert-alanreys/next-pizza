@@ -1,3 +1,5 @@
+'use client';
+
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
@@ -13,7 +15,7 @@ interface Props {
 	name: string;
 	price: number;
 	imageUrl?: string;
-	ingredients?: Array<{ name: string }>;
+	ingredients?: Array<{ name: string; id: number }>;
 	className?: string;
 }
 

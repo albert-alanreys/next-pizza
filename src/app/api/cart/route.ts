@@ -142,8 +142,8 @@ async function updateCartTotalAmount(cartId: number, totalAmount: number) {
 
 export async function POST(req: NextRequest) {
 	try {
-		const userId = Number(1);
 		let cartToken = req.cookies.get('cartToken')?.value;
+		const userId = Number(1);
 
 		const data = (await req.json()) as CreateCartItemValues;
 
