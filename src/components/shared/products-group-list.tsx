@@ -7,12 +7,14 @@ import { useCategoryStore } from '@/store/category';
 
 import { cn } from '@/lib/utils';
 
+import { CategoryProducts } from '@/@types/prisma';
+
 import { ProductCard } from './product-card';
 import { Title } from './title';
 
 interface Props {
 	title: string;
-	products: any[];
+	products: CategoryProducts['products'];
 	categoryId: number;
 	className?: string;
 	listClassName?: string;
@@ -46,15 +48,19 @@ export const ProductsGroupList: React.FC<Props> = ({
 				ref={intersectionRef}
 				className={cn('grid grid-cols-3 gap-[50px]', listClassName)}
 			>
-				{products.map((product, index) => (
-					<ProductCard
-						key={product.id}
-						id={product.id}
-						name={product.name}
-						imageUrl={product.imageUrl}
-						price={product.price}
-					/>
-				))}
+				{products.map((product) => {
+					return (
+						<ProductCard
+							key={product.id}
+							id={product.id}
+							name={product.name}
+							imageUrl={product.imageUrl}
+							price={Math.min(
+								...Array.from(product.items, (item) => item.price),
+							)}
+						/>
+					);
+				})}
 			</div>
 		</div>
 	);
