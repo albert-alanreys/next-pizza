@@ -17,14 +17,12 @@ interface Props {
 	name: string;
 	className?: string;
 	items?: IProduct['items'];
-	onClickAdd?: VoidFunction;
 }
 
 export const ChooseProductForm: React.FC<Props> = ({
 	name,
 	items,
 	imageUrl,
-	onClickAdd,
 	className,
 }) => {
 	const { addCartItem, loading } = useCart();
@@ -51,8 +49,6 @@ export const ChooseProductForm: React.FC<Props> = ({
 			console.error(error);
 			toast.error('Произошла ошибка при добавлении в корзину');
 		}
-
-		onClickAdd?.();
 	};
 
 	return (

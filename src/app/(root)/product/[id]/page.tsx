@@ -1,9 +1,12 @@
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import { Container } from '@/components/shared/container';
-import { ProductsGroupList } from '@/components/shared/products-group-list';
 
-import { ChoosePizzaForm } from '@/components/shared';
+import {
+	ChoosePizzaForm,
+	ChooseProductForm,
+	ProductsGroupList,
+} from '@/components/shared';
 
 import { prisma } from '@/lib/prisma';
 
@@ -56,12 +59,20 @@ export default async function ProductPage({
 
 	return (
 		<Container className='flex flex-col my-10'>
-			<ChoosePizzaForm
-				imageUrl={product.imageUrl}
-				name={product.name}
-				items={product.items}
-				ingredients={product.ingredients}
-			/>
+			{product.items[0].pizzaType ? (
+				<ChoosePizzaForm
+					imageUrl={product.imageUrl}
+					name={product.name}
+					items={product.items}
+					ingredients={product.ingredients}
+				/>
+			) : (
+				<ChooseProductForm
+					imageUrl={product.imageUrl}
+					name={product.name}
+					items={product.items}
+				/>
+			)}
 
 			<ProductsGroupList
 				className='mt-20'
