@@ -73,6 +73,7 @@ export const findPizzas = async (params: GetSearchParams) => {
 								price: 'asc',
 							},
 						},
+						ingredients: true,
 					},
 				},
 			},

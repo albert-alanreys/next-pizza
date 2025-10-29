@@ -58,6 +58,7 @@ export const ProductsGroupList: React.FC<Props> = ({
 							price={Math.min(
 								...Array.from(product.items, (item) => item.price),
 							)}
+							ingredients={product.ingredients}
 						/>
 					);
 				})}

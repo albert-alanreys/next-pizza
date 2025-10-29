@@ -11,7 +11,7 @@ import {
 	pizzaSizes,
 } from '@/lib/pizza-details-to-text';
 
-// import { useCart } from './use-cart';
+import { useCart } from './use-cart';
 
 export type IProduct = Product & {
 	items: ProductItem[];
@@ -22,9 +22,7 @@ export const useChoosePizza = (items?: IProduct['items']) => {
 	const [selectedIngredientsIds, { toggle: toggleAddIngredient }] =
 		useSet<number>(new Set([]));
 
-	// const { addCartItem, loading } = useCart();
-	const addCartItem = () => {};
-	const loading = false;
+	const { addCartItem, loading } = useCart();
 
 	const [size, setSize] = React.useState<PizzaSize>(20);
 	const [type, setType] = React.useState<PizzaType>(1);
@@ -57,13 +55,16 @@ export const useChoosePizza = (items?: IProduct['items']) => {
 	const addPizza = async () => {
 		if (productItem) {
 			try {
-				// await addCartItem({
-				// 	productItemId: productItem?.id,
-				// 	pizzaSize: size,
-				// 	type,
-				// 	ingredientsIds: Array.from(selectedIngredientsIds),
-				// 	quantity: 1,
-				// });
+				await Promise.resolve(
+					addCartItem({
+						productItemId: productItem?.id,
+						pizzaSize: size,
+						type,
+						ingredientsIds: Array.from(selectedIngredientsIds),
+						quantity: 1,
+					}),
+				);
+
 				toast.success('Товар добавлен в корзину');
 			} catch (error) {
 				console.error(error);

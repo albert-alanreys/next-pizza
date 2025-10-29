@@ -3,7 +3,7 @@
 import React from 'react';
 import toast from 'react-hot-toast';
 
-// import { useCart } from '@/hooks/use-cart';
+import { useCart } from '@/hooks/use-cart';
 import { IProduct } from '@/hooks/use-choose-pizza';
 
 import { cn } from '@/lib/utils';
@@ -27,9 +27,7 @@ export const ChooseProductForm: React.FC<Props> = ({
 	onClickAdd,
 	className,
 }) => {
-	// const { addCartItem, loading } = useCart();
-	const addCartItem = () => {};
-	const loading = false;
+	const { addCartItem, loading } = useCart();
 
 	const productItem = items?.[0];
 
@@ -41,10 +39,13 @@ export const ChooseProductForm: React.FC<Props> = ({
 
 	const handleClickAdd = async () => {
 		try {
-			// await addCartItem({
-			// 	productItemId: productItem.id,
-			// 	quantity: 1,
-			// });
+			await Promise.resolve(
+				addCartItem({
+					productItemId: productItem.id,
+					quantity: 1,
+				}),
+			);
+
 			toast.success('Товар добавлен в корзину');
 		} catch (error) {
 			console.error(error);

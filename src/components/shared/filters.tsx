@@ -9,7 +9,7 @@ import { useMap, useSet } from 'react-use';
 
 import { Input } from '@/components/ui/input';
 
-import { CheckboxFiltersGroup } from '@/components/shared/checkbox-filters-group';
+import { CheckboxFiltersGroup } from '@/components/shared';
 
 import { Api } from '@/services/api-client';
 
