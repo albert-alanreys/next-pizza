@@ -18,7 +18,12 @@ export default function RootLayout({
 	return (
 		<html className={nunito.variable} lang='ru' data-scroll-behavior='smooth'>
 			<head>
-				<link data-rh='true' rel='icon' href='/logo.png' />
+				<link
+					data-rh='true'
+					rel='icon'
+					href='/favicon.svg'
+					type='image/svg+xml'
+				/>
 			</head>
 			<body>
 				<Providers>{children}</Providers>
