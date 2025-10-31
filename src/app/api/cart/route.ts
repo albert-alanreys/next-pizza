@@ -153,16 +153,32 @@ export async function POST(req: NextRequest) {
 
 		let userCart = await findOrCreateCart(userId, cartToken);
 
-		const findCartItem = await prisma.cartItem.findFirst({
+		const candidateItems = await prisma.cartItem.findMany({
 			where: {
 				cartId: userCart.id,
 				productItemId: data.productItemId,
-				ingredients: { every: { id: { in: data.ingredientsIds } } },
+				pizzaSize: data.pizzaSize,
+				type: data.type,
+			},
+			include: {
+				ingredients: true,
 			},
 		});
 
+		const newIngredients = (data.ingredientsIds || []).sort((a, b) => a - b);
+
+		const findCartItem = candidateItems.find((item) => {
+			const existingIngredients = item.ingredients
+				.map((ing) => ing.id)
+				.sort((a, b) => a - b);
+			return (
+				existingIngredients.length === newIngredients.length &&
+				existingIngredients.every((id, index) => id === newIngredients[index])
+			);
+		});
+
 		if (findCartItem) {
-			const updatedCartItem = await prisma.cartItem.update({
+			await prisma.cartItem.update({
 				where: {
 					id: findCartItem.id,
 				},
@@ -171,7 +187,10 @@ export async function POST(req: NextRequest) {
 				},
 			});
 
-			const resp = NextResponse.json(updatedCartItem);
+			const totalAmount = await getCartTotalAmount(userCart.id);
+			const updatedCart = await updateCartTotalAmount(userCart.id, totalAmount);
+
+			const resp = NextResponse.json(updatedCart);
 			resp.cookies.set('cartToken', cartToken);
 			return resp;
 		}

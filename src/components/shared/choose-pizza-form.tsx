@@ -46,9 +46,9 @@ export const ChoosePizzaForm: React.FC<Props> = ({
 		ingredients
 			?.filter((ingredient) => selectedIngredientsIds.has(ingredient.id))
 			?.reduce((acc, item) => acc + item.price, 0) || 0;
-
 	const pizzaPrice: number =
-		items?.find((item) => item.pizzaType === type)?.price || 0;
+		items?.find((item) => item.pizzaType === type && item.size === size)
+			?.price || 0;
 	const totalPrice: number = totalIngredientPrice + pizzaPrice;
 
 	const handleClickAdd = async () => {

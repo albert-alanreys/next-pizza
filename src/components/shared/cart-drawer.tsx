@@ -33,7 +33,6 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
 		<Sheet>
 			<SheetTrigger asChild>{children}</SheetTrigger>
 			<SheetContent className='flex flex-col justify-between pb-0 bg-[#F4F1EE]'>
-				{/* Добавляем SheetDescription для accessibility */}
 				<VisuallyHidden>
 					<SheetDescription>Корзина с выбранными товарами</SheetDescription>
 				</VisuallyHidden>
@@ -44,14 +43,18 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
 						!totalAmount && 'justify-center',
 					)}
 				>
-					{totalAmount > 0 && (
-						<SheetHeader>
+					<SheetHeader>
+						{totalAmount > 0 ? (
 							<SheetTitle>
 								В корзине{' '}
 								<span className='font-bold'>{items.length} товара</span>
 							</SheetTitle>
-						</SheetHeader>
-					)}
+						) : (
+							<SheetTitle asChild>
+								<VisuallyHidden>Корзина пуста</VisuallyHidden>
+							</SheetTitle>
+						)}
+					</SheetHeader>
 
 					{!totalAmount && (
 						<div className='flex flex-col items-center justify-center w-72 mx-auto'>
