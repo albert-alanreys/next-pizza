@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import React from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -12,27 +13,30 @@ import {
 	orderFormSchema,
 } from '@/components/shared/schemas/order-form-schema';
 import { CartItemSkeleton } from '@/components/shared/skeletons/cart-item-skeleton';
-import { Title } from '@/components/shared/title';
-import { WhiteBlock } from '@/components/shared/white-block';
 
 import {
 	AddressInput,
 	CartItem,
 	CartSidebar,
 	Container,
+	Title,
+	WhiteBlock,
 } from '@/components/shared';
 
 import { useCart } from '@/hooks/use-cart';
+
+import { Api } from '@/services/api-client';
 
 import { createOrder } from '@/app/actions';
 
 const VAT = 15;
 const DELIVERY_PRICE = 250;
 
-export default function CheckoutPage() {
+export default function CartPage() {
 	const { totalAmount, items, loading, updateItemQuantity, removeCartItem } =
 		useCart(true);
 	const [submitting, setSubmitting] = React.useState(false);
+	const { data: session } = useSession();
 
 	const form = useForm<TFormOrderData>({
 		resolver: zodResolver(orderFormSchema),
@@ -45,6 +49,21 @@ export default function CheckoutPage() {
 			comment: '',
 		},
 	});
+
+	React.useEffect(() => {
+		async function fetchUserInfo() {
+			const data = await Api.auth.getMe();
+			const [firstName, lastName] = data.fullName.split(' ');
+
+			form.setValue('firstName', firstName);
+			form.setValue('lastName', lastName);
+			form.setValue('email', data.email);
+		}
+
+		if (session) {
+			fetchUserInfo();
+		}
+	}, [session]);
 
 	const onClickCountButton = (
 		id: number,

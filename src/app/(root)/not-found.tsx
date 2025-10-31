@@ -6,7 +6,7 @@ export default function NotFoundPage() {
 			<InfoBlock
 				title='Страница не найдена'
 				text='Проверьте корректность введённого адреса или повторите попытку позже'
-				imageUrl='/assets/images/not-found.png'
+				imageUrl='/images/not-found.png'
 			/>
 		</div>
 	);

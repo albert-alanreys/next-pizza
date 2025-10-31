@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { calcCartItemTotalAmount } from '@/lib/calc-cart-item-total-amount';
+import { getUserSession } from '@/lib/get-user-session';
 import { prisma } from '@/lib/prisma';
 
 async function updateCartTotalAmount(userId: number, cartToken: string) {
@@ -69,7 +70,8 @@ export async function PATCH(
 		const resolvedParams = await params;
 
 		const cartToken = req.cookies.get('cartToken')?.value;
-		const userId = Number(1);
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
 
 		if (!cartToken) {
 			return NextResponse.json({ error: 'Cart token not found' });
@@ -144,7 +146,8 @@ export async function DELETE(
 		const resolvedParams = await params;
 
 		const cartToken = req.cookies.get('cartToken')?.value;
-		const userId = Number(1);
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
 
 		if (!cartToken) {
 			return NextResponse.json({ error: 'Cart token not found' });

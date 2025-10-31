@@ -8,8 +8,10 @@ import toast from 'react-hot-toast';
 
 import { cn } from '@/lib/utils';
 
+import { AuthModal } from './auth-modal';
 import { CartButton } from './cart-button';
 import { Container } from './container';
+import { ProfileButton } from './profile-button';
 import { SearchInput } from './search-input';
 
 interface Props {
@@ -23,6 +25,7 @@ export const Header: React.FC<Props> = ({
 	hasSearch = true,
 	hasCart = true,
 }) => {
+	const [openAuthModal, setOpenAuthModal] = React.useState(false);
 	const searchParams = useSearchParams();
 	const router = useRouter();
 
@@ -40,12 +43,14 @@ export const Header: React.FC<Props> = ({
 		if (toastMessage) {
 			setTimeout(() => {
 				router.replace('/');
-				toast.success(toastMessage, {
-					duration: 3000,
-				});
+				toast.success(toastMessage, { duration: 3000 });
 			}, 1000);
 		}
 	}, []);
+
+	const onClickOpenAuthModal = () => setOpenAuthModal(true);
+
+	const onCloseAuthModal = () => setOpenAuthModal(false);
 
 	return (
 		<header className={cn('border-b border-gray-100', className)}>
@@ -69,6 +74,10 @@ export const Header: React.FC<Props> = ({
 				)}
 
 				<div className='flex items-center gap-3'>
+					<AuthModal open={openAuthModal} onClose={onCloseAuthModal} />
+
+					<ProfileButton onClickOpenModal={onClickOpenAuthModal} />
+
 					{hasCart && <CartButton />}
 				</div>
 			</Container>

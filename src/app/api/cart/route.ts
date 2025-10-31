@@ -4,12 +4,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CreateCartItemValues } from '@/services/dto/cart';
 
 import { calcCartItemTotalAmount } from '@/lib/calc-cart-item-total-amount';
+import { getUserSession } from '@/lib/get-user-session';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
 	try {
 		const cartToken = req.cookies.get('cartToken')?.value;
-		const userId = Number(1);
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
 
 		if (!cartToken) {
 			return NextResponse.json({ items: [] });
@@ -143,7 +145,8 @@ async function updateCartTotalAmount(cartId: number, totalAmount: number) {
 export async function POST(req: NextRequest) {
 	try {
 		let cartToken = req.cookies.get('cartToken')?.value;
-		const userId = Number(1);
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
 
 		const data = (await req.json()) as CreateCartItemValues;
 
@@ -224,7 +227,8 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
 	try {
 		const cartToken = req.cookies.get('cartToken')?.value;
-		const userId = Number(1);
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
 
 		if (!cartToken) {
 			return NextResponse.json(

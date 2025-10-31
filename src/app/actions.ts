@@ -1,9 +1,13 @@
 'use server';
 
-import { Prisma } from '@prisma/client';
+import { OrderStatus, Prisma } from '@prisma/client';
 import { hashSync } from 'bcrypt';
-import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
+import { TFormOrderData } from '@/components/shared/schemas/order-form-schema';
+
+import { createPayment } from '@/lib/create-payment';
+import { getUserSession } from '@/lib/get-user-session';
 import { prisma } from '@/lib/prisma';
 import { sendEmail } from '@/lib/send-email';
 
@@ -40,6 +44,8 @@ export async function registerUser(body: Prisma.UserCreateInput) {
 			},
 		});
 
+		console.log(createdUser);
+
 		const html = `
     <p>Код подтверждения: <h2>${code}</h2></p>
     <p><a href="http://localhost:3000/api/auth/verify?code=${code}">Подтвердить регистрацию</a></p>
@@ -56,18 +62,21 @@ export async function registerUser(body: Prisma.UserCreateInput) {
 	}
 }
 
-/* Dashboard Actions */
-
-export async function updateUser(id: number, data: Prisma.UserUpdateInput) {
+export async function updateUserInfo(body: Prisma.UserCreateInput) {
 	try {
+		const currentUser = await getUserSession();
+
+		if (!currentUser) {
+			throw new Error('Пользователь не найден');
+		}
+
 		await prisma.user.update({
 			where: {
-				id,
+				id: Number(currentUser.id),
 			},
 			data: {
-				...data,
-				verified: new Date(),
-				...(data.password && { password: hashSync(String(data.password), 10) }),
+				...body,
+				password: hashSync(body.password, 10),
 			},
 		});
 	} catch (error) {
@@ -76,209 +85,110 @@ export async function updateUser(id: number, data: Prisma.UserUpdateInput) {
 	}
 }
 
-export async function createUser(data: Prisma.UserCreateInput) {
+export async function createOrder(data: TFormOrderData) {
 	try {
-		await prisma.user.create({
+		const currentUser = await getUserSession();
+		const userId = Number(currentUser?.id);
+		const cookieStore = await cookies();
+		const cartToken = cookieStore.get('cartToken')?.value;
+
+		const userCart = await prisma.cart.findFirst({
+			include: {
+				user: true,
+				items: {
+					include: {
+						ingredients: true,
+						productItem: {
+							include: {
+								product: true,
+							},
+						},
+					},
+				},
+			},
+			where: {
+				OR: [
+					{
+						userId,
+					},
+					{
+						tokenId: cartToken,
+					},
+				],
+			},
+		});
+
+		if (!userCart?.totalAmount) {
+			return;
+		}
+
+		if (!userCart) {
+			throw new Error('Cart not found');
+		}
+
+		const order = await prisma.order.create({
 			data: {
-				...data,
-				password: hashSync(data.password, 10),
+				userId,
+				fullName: data.firstName + ' ' + data.lastName,
+				email: data.email,
+				phone: data.phone,
+				address: data.address,
+				comment: data.comment,
+				totalAmount: userCart.totalAmount,
+				status: OrderStatus.PENDING,
+				items: JSON.stringify(userCart.items),
 			},
 		});
 
-		revalidatePath('/dashboard/users');
-	} catch (error) {
-		console.log('Error [CREATE_USER]', error);
-		throw error;
-	}
-}
-
-export async function deleteUser(id: number) {
-	await prisma.user.delete({
-		where: {
-			id,
-		},
-	});
-
-	revalidatePath('/dashboard/users');
-}
-
-export async function updateCategory(
-	id: number,
-	data: Prisma.CategoryUpdateInput,
-) {
-	try {
-		await prisma.category.update({
+		await prisma.cart.update({
 			where: {
-				id,
+				id: userCart.id,
 			},
-			data,
-		});
-	} catch (error) {
-		console.log('Error [UPDATE_CATEGORY]', error);
-		throw error;
-	}
-}
-
-export async function createCategory(data: Prisma.CategoryCreateInput) {
-	try {
-		await prisma.category.create({
-			data,
-		});
-
-		revalidatePath('/dashboard/categories');
-	} catch (error) {
-		console.log('Error [CREATE_CATEGORY]', error);
-		throw error;
-	}
-}
-
-export async function deleteCategory(id: number) {
-	await prisma.category.delete({
-		where: {
-			id,
-		},
-	});
-
-	revalidatePath('/dashboard/categories');
-}
-
-export async function updateProduct(
-	id: number,
-	data: Prisma.ProductUpdateInput,
-) {
-	try {
-		await prisma.product.update({
-			where: {
-				id,
-			},
-			data,
-		});
-	} catch (error) {
-		console.log('Error [UPDATE_PRODUCT]', error);
-		throw error;
-	}
-}
-
-export async function createProduct(data: Prisma.ProductCreateInput) {
-	try {
-		await prisma.product.create({
-			data,
-		});
-
-		revalidatePath('/dashboard/products');
-	} catch (error) {
-		console.log('Error [CREATE_PRODUCT]', error);
-		throw error;
-	}
-}
-
-export async function deleteProduct(id: number) {
-	await prisma.product.delete({
-		where: {
-			id,
-		},
-	});
-
-	revalidatePath('/dashboard/products');
-}
-
-export async function updateIngredient(
-	id: number,
-	data: Prisma.IngredientUpdateInput,
-) {
-	try {
-		await prisma.ingredient.update({
-			where: {
-				id,
-			},
-			data,
-		});
-	} catch (error) {
-		console.log('Error [UPDATE_INGREDIENT]', error);
-		throw error;
-	}
-}
-
-export async function createIngredient(data: Prisma.IngredientCreateInput) {
-	try {
-		await prisma.ingredient.create({
 			data: {
-				name: data.name,
-				imageUrl: data.imageUrl,
-				price: data.price,
+				totalAmount: 0,
 			},
 		});
 
-		revalidatePath('/dashboard/ingredients');
-	} catch (error) {
-		console.log('Error [CREATE_INGREDIENT]', error);
-		throw error;
-	}
-}
-
-export async function deleteIngredient(id: number) {
-	try {
-		await prisma.ingredient.delete({
+		await prisma.cartItem.deleteMany({
 			where: {
-				id,
+				cartId: userCart.id,
 			},
 		});
 
-		revalidatePath('/dashboard/ingredients');
-	} catch (error) {
-		console.log('Error [DELETE_INGREDIENT]', error);
-		throw error;
-	}
-}
-
-export async function updateProductItem(
-	id: number,
-	data: Prisma.ProductItemUpdateInput,
-) {
-	try {
-		await prisma.productItem.update({
-			where: {
-				id,
-			},
-			data,
-		});
-	} catch (error) {
-		console.log('Error [UPDATE_PRODUCT_ITEM]', error);
-		throw error;
-	}
-}
-
-export async function createProductItem(
-	data: Prisma.ProductItemUncheckedCreateInput,
-) {
-	try {
-		await prisma.productItem.create({
-			data: {
-				price: data.price,
-				size: data.size,
-				pizzaType: data.pizzaType,
-				productId: data.productId,
-			},
+		const paymentData = await createPayment({
+			orderId: order.id,
+			amount: order.totalAmount,
+			description: `Заказ #${order.id}`,
 		});
 
-		revalidatePath('/dashboard/product-items');
-	} catch (error) {
-		console.log('Error [CREATE_PRODUCT_ITEM]', error);
-		throw error;
-	}
-}
+		if (paymentData) {
+			await prisma.order.update({
+				where: {
+					id: order.id,
+				},
+				data: {
+					paymentId: paymentData.id,
+				},
+			});
+		}
 
-export async function deleteProductItem(id: number) {
-	try {
-		await prisma.productItem.delete({
-			where: {
-				id,
-			},
-		});
+		const html = `
+      <h1>Заказ #${order?.id}</h1>
 
-		revalidatePath('/dashboard/product-items');
+      <p>Оплатите заказ на сумму ${order?.totalAmount}. Перейдите <a href="${paymentData.confirmation.confirmation_url}">по ссылке</a> для оплаты заказа.</p>
+    `;
+
+		if (userCart.user?.email) {
+			await sendEmail(
+				userCart.user?.email,
+				`Next Pizza / Оплатите заказ #${order?.id}`,
+				html,
+			);
+		}
+
+		return paymentData.confirmation.confirmation_url;
 	} catch (error) {
-		console.log('Error [DELETE_PRODUCT_ITEM]', error);
+		console.log('[CART_CHECKOUT_POST] Server error', error);
 		throw error;
 	}
 }

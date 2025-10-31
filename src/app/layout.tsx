@@ -16,7 +16,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html className={nunito.variable} lang='ru' data-scroll-behavior='smooth'>
+		<html className={nunito.variable} lang='en'>
 			<head>
 				<link
 					data-rh='true'
