@@ -70,7 +70,7 @@ export const CartDrawer: React.FC<React.PropsWithChildren> = ({ children }) => {
 								className='text-center font-bold my-2'
 							/>
 							<p className='text-center text-neutral-500 mb-5'>
-								Добавьте хотя бы один продукт, чтобы совершить заказ
+								Добавьте хотя бы один товар, чтобы совершить заказ
 							</p>
 
 							<SheetClose asChild>

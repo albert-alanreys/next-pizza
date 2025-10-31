@@ -53,7 +53,7 @@ export const SearchInput = () => {
 				<input
 					className='rounded-2xl outline-none w-full bg-gray-50 pl-11'
 					type='text'
-					placeholder='Найти пиццу...'
+					placeholder='Найти товар...'
 					onFocus={() => setFocused(true)}
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}

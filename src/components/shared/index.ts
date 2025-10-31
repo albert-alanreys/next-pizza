@@ -1,5 +1,8 @@
+export { AddressInput } from './address-input';
 export { CartButton } from './cart-button';
 export { CartDrawer } from './cart-drawer';
+export { CartItem } from './cart-item';
+export { CartSidebar } from './cart-sidebar';
 export { Categories } from './categories';
 export { CheckboxFiltersGroup } from './checkbox-filters-group';
 export { ChoosePizzaForm } from './choose-pizza-form';
