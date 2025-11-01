@@ -23,7 +23,7 @@ export default async function OrdersPage() {
 	return (
 		<Container className='my-5'>
 			<Title
-				text='Оформление заказа'
+				text='Оформленные заказы'
 				size='xl'
 				className='font-extrabold mb-8'
 			/>

@@ -29,7 +29,7 @@ import { Api } from '@/services/api-client';
 
 import { createOrder } from '@/app/actions';
 
-const VAT = 15;
+const VAT = 20;
 const DELIVERY_PRICE = 250;
 
 export default function CartPage() {

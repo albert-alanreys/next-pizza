@@ -27,13 +27,13 @@ export const CartSidebar: React.FC<Props> = ({
 	return (
 		<WhiteBlock className={cn('p-6 sticky top-4', className)}>
 			<div className='flex flex-col gap-1'>
-				<span className='text-xl'>Итого:</span>
+				<span className='text-xl'>Итого к оплате:</span>
 				<span className='text-4xl font-extrabold'>{totalPrice} ₽</span>
 			</div>
 
 			<div className='flex my-4'>
 				<span className='flex flex-1 text-lg text-neutral-500'>
-					Стоимость товаров:
+					Сумма заказа:
 					<div className='flex-1 border-b border-dashed border-b-neutral-200 relative -top-1 mx-2' />
 				</span>
 
@@ -42,7 +42,7 @@ export const CartSidebar: React.FC<Props> = ({
 
 			<div className='flex my-4'>
 				<span className='flex flex-1 text-lg text-neutral-500'>
-					Налоги:
+					НДС (20%):
 					<div className='flex-1 border-b border-dashed border-b-neutral-200 relative -top-1 mx-2' />
 				</span>
 
